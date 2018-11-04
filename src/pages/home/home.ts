@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, AlertController, reorderArray, ToastController } from 'ionic-angular';
 import { TareaProvider } from '../../providers/tarea/tarea';
 import { TareasArchivadasPage } from '../tareas-archivadas/tareas-archivadas';
+import { TareaHttpProvider } from '../../providers/tarea-http/tarea-http';
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
@@ -12,11 +13,24 @@ export class HomePage {
   constructor(
     public navCtrl: NavController,
     public alerta: AlertController,
-    private servicioTareas: TareaProvider,
-    private toast: ToastController
+    //private servicioTareas: TareaProvider,
+    private toast: ToastController,
+    private tareahttp: TareaHttpProvider
     ) {
-   this.tareas = servicioTareas.obtenerTareas();
+   //this.tareas = servicioTareas.obtenerTareas();
+   tareahttp.obtenerTareas()
   }
+
+
+  ionViewDidLoad(){
+    this.tareahttp.obtenerTareas().subscribe(
+    (datos : any []) => {
+      this.tareas = datos;
+    }
+
+    )
+  }
+
 
   agregarTarea(){
     let alert = this.alerta.create({
@@ -31,7 +45,13 @@ export class HomePage {
       handler: (dato) => {
         console.log(dato);
         // this.tareas.push(dato.textoTarea);
-        this.servicioTareas.agregarTarea(dato.textoTarea);
+        //this.servicioTareas.agregarTarea(dato.textoTarea);
+        this.tareahttp.agregarTarea(dato.textoTarea).subscribe(
+          (datos) => {
+            this.tareas.push(datos)
+          }
+
+        )
       }
     }
       ]
@@ -41,21 +61,39 @@ export class HomePage {
   irPaginaArchivadas(){
     this.navCtrl.push(TareasArchivadasPage);
   }
-  archivarTarea(indice){
-    this.servicioTareas.archivarTarea(indice)
+  archivarTarea(id,indice){
+    //this.servicioTareas.archivarTarea(indice)
+    this.tareahttp.archivarTarea(id).subscribe(
+      (datos) => {
+        //this.tareas[indice]=datos
+        this.tareas.splice(indice,1);
+        
+        
+      }
+
+    )
   }
-  editarTarea(indice){
+
+
+  editarTarea(titulo,id,indice){
     let alert = this.alerta.create({
       title: "Editar tarea",
       inputs: [{
         type: "text",
         name: "textoTarea",
-        value: this.tareas[indice]
+        value: titulo//this.tareas[indice]
       }],
       buttons: [{
         text: "Guardar",
         handler: (datos) => {
-          this.servicioTareas.editarTarea(datos.textoTarea, indice);
+          //this.servicioTareas.editarTarea(datos.textoTarea, indice);
+          this.tareahttp.editarTarea(id, datos.textoTarea).subscribe(
+            (datos) => {
+              this.tareas[indice]=datos
+            }
+  
+          )
+          
           let toast = this.toast.create({
             message: "Tarea editada exitosamente",
             duration: 2000

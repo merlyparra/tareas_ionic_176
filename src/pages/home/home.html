@@ -18,14 +18,14 @@
 <ion-content padding>
 <ion-list [reorder]="habilitar" (ionItemReorder)="ordenarTareas($event)">
   <ion-item-sliding *ngFor="let tarea of tareas;let indice= index">
-    <ion-item>{{tarea}}</ion-item>
+    <ion-item>{{tarea.titulo}}</ion-item>
     <ion-item-options side="right">
-      <button color="danger" ion-button (click)="archivarTarea(indice)">
+      <button color="danger" ion-button (click)="archivarTarea(tarea.id,indice)">
         <ion-icon name="trash" ></ion-icon>
       </button>
     </ion-item-options>
     <ion-item-options side="left">
-      <button color="danger" ion-button (click)="editarTarea(indice)">
+      <button color="danger" ion-button (click)="editarTarea(tarea.titulo,tarea.id,indice)">
         <ion-icon name="create" ></ion-icon>
       </button>
     </ion-item-options>
